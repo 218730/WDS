@@ -1,148 +1,167 @@
 #include "firework.h"
 
 Firework::Firework(Qt3DCore::QEntity *rootEntity)
-    : m_rootEntity(rootEntity)
+         : m_rootEntity(rootEntity)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
+    boomed = false;
     velocity = QVector3D(0, 10, 0);
     acceleration = QVector3D(0, 0, 0);
     gravity = QVector3D(0, -0.2, 0);
 
-    //srand((unsigned)time(NULL));
-    //x = random()%200-100;
-    //z = random()%200-100;
-    x = uni(rng)%200-100;
-    z = uni(rng)%200-100;
+    x = uni(rng)%400-200;
+    z = uni(rng)%400-200;
     pos = QVector3D(x, -4.0f, z);
 
     SetAndAdd();
-
-    QTimer *timer = new QTimer();
-    connect(timer,SIGNAL(timeout()),this,SLOT(update()));
-    timer->start(20);
 }
 
-Firework::~Firework()
-{
-    //delete this;
-}
-
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed) : m_rootEntity(rootEntity)
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed)
+         : m_rootEntity(rootEntity)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
-    //srand((unsigned)time(NULL));
     boomed = true;
-    velocity = QVector3D(uni(rng)%1-0.5, uni(rng)%1-0.5, uni(rng)%1-0.5);
+    velocity = QVector3D(uni(rng)%2-1, uni(rng)%2-1, uni(rng)%2-1);
     velocity = velocity * QVector3D(uni(rng)%5+1,uni(rng)%5+1,uni(rng)%5+1);
-    //velocity.setX(velocity.x() * ((uni(rng))%3));
-    //velocity.setY(velocity.y() * ((uni(rng))%3));
-    //velocity.setZ(velocity.z() * ((uni(rng))%3));
+
     acceleration = QVector3D(0, 0, 0);
     pos = posboomed;
     gravity = QVector3D(0, -0.2, 0);
     lifespan = 255;
 
     SetAndAdd();
-
-    QTimer *timer = new QTimer();
-    connect(timer,SIGNAL(timeout()),this,SLOT(updateBOOM()));
-    timer->start(20);
 }
 
-void Firework::mousePressEvent(QMouseEvent *e)
+Firework::~Firework()
 {
-    if(e->button() == Qt::LeftButton){
-    qDebug() << "Fdsfds";
-    }
+    //m_rootEntity = nullptr;
+    delete sphereMaterial;
+    delete sphereMesh;
+    delete sphereTransform;
+    delete m_sphereEntity;
+    //delete m_rootEntity;     // - Czemu nie można usunąć?
 }
 
-void Firework::moveY(){
-// Jeżęli box == checked
+void Firework::move(){
     velocity = velocity + acceleration;
     pos = pos + velocity;
     acceleration = acceleration*0;
 
     sphereTransform->setTranslation(QVector3D(pos.x(), pos.y(), pos.z()));
-
-}
-
-void Firework::moveOnSphere(){
-    //srand((unsigned)time(NULL));
-
-    //if(boomed){
-        velocity = velocity + acceleration;
-        pos = pos + velocity;
-        acceleration = acceleration*0;
-
-        sphereTransform->setTranslation(QVector3D(pos.x(), pos.y(), pos.z()));
-    //}
-
+    //trail();
 }
 
 void Firework::destroy(){
-    if(!boomed){
-        //if(pos.y() >= y_temp){
-        if(velocity.y() <= 0){
-            //y = -5.0f;
-            //pos = QVector3D(pos.x(), y_temp, pos.z());
-            boomed = true;
+    if(velocity.y() <= 0 && !boomed){
             m_sphereEntity->removeComponent(sphereMaterial);
             m_sphereEntity->removeComponent(sphereTransform);
             m_sphereEntity->removeComponent(sphereMesh);
-
+            YOUCANDELETEROOT = true;
         }
-    }
+}
+
+void Firework::trail(){
+    QVector3D pos_t;
+    pos_t.setY(pos.y() - velocity.y());
+
+    m_sphereEntity->addComponent(sphereMesh);
+    m_sphereEntity->addComponent(sphereMaterial);
+
+    sphereTransform->setScale3D(QVector3D(0.98, 0.98, 0.98));
+    sphereTransform->setTranslation(QVector3D(pos.x(), pos_t.y(), pos.z()));
+    m_sphereEntity->addComponent(sphereTransform);
+
 }
 
 void Firework::update(){
-    ApplyForce();
-    moveY();
-    destroy();
+    if(!boomed){
+        ApplyForce();
+        move();
+        destroy();
+    }
+    else if(boomed){
+        updateBOOM();
+    }
 }
 
 void Firework::updateBOOM(){
-    //std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-    //std::uniform_int_distribution<int> uni; // guaranteed unbiased
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
         velocity = velocity * QVector3D(0.90, 0.90, 0.90);
-        //velocity = velocity + QVector3D(((uni(rng))%1-0.5), ((uni(rng))%1-0.5), ((uni(rng))%1-0.5));
-        lifespan -= 6;
-    if(lifespan <= 0) {
-        lifespan = 0;
-        sphereMaterial->setDiffuse(QColor(255,0,0,lifespan));
+        sphereTransform->setScale3D(sphereTransform->scale3D() * QVector3D(0.98, 0.98, 0.98));
+
+    ApplyForce();
+    move();
+
+    lifespan -= 5;
+    if(lifespan <= 0){
+        lifespan = 0;}
+
+    sphereMaterial->setAlpha(map(lifespan)); // 0 - znika // 1 - pelna widocznosc ---------- RGBA 0 - transparent // 255 - pelna widocznosc
+
+    if(lifespan <= 0){
+        sphereTransform->setScale3D(QVector3D(0, 0, 0));
+
         m_sphereEntity->removeComponent(sphereMaterial);
         m_sphereEntity->removeComponent(sphereTransform);
         m_sphereEntity->removeComponent(sphereMesh);
+        YOUCANDELETE = true;
     }
-    ApplyForce();
-    moveOnSphere();
+}
+
+float Firework::map(int lifespan_t){
+    double slope = 1.0 * (0 - 1) / (0 - 255);
+    float output = 1 + slope * (lifespan_t - 255);
+
+    return output;
 
 }
 
 void Firework::SetAndAdd(){
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni; // guaranteed unbiased
+    //int xyz = random()%2;
+
+    h_color = uni(rng)%255;
+    s_color = uni(rng)%255;
+    v_color = uni(rng)%255;
+    a_color = 255;
+
+    QColor p_color(h_color, s_color, v_color, a_color);
+
     sphereMesh->setRings(10);
     sphereMesh->setSlices(15);
     sphereMesh->setRadius(0.3);
 
-    sphereMaterial->setDiffuse(QColor(random()%255,random()%255,random()%255));
-    //sphereMaterial->setAmbient(QColor(255,0,0,0));
-    //sphereMaterial->setShininess(5);
+    //sphereMaterial->setDiffuse(p_color.toHsv());
+    sphereMaterial->setAmbient(p_color.toHsv());
 
-    sphereTransform->setScale3D(QVector3D(1.0f,1.0f,1.0f));
+    //sphereMaterial->setShininess(25);
+
+    sphereTransform->setScale3D(QVector3D(2.0f,2.0f,2.0f));
     sphereTransform->setTranslation(pos);
 
-    m_sphereEntity = new Qt3DCore::QEntity(m_rootEntity);
     m_sphereEntity->addComponent(sphereMesh);
     m_sphereEntity->addComponent(sphereMaterial);
     m_sphereEntity->addComponent(sphereTransform);
+
 }
 
 bool Firework::CheckIfDead(){
     return boomed;
+}
+
+bool Firework::CanIDelete(){
+    return YOUCANDELETE;
+}
+
+bool Firework::CanIDeleteRoot(){
+    return YOUCANDELETEROOT;
 }
 
 QVector3D Firework::ReturnPosition(){
@@ -155,4 +174,11 @@ void Firework::ApplyForce(){
 
 int Firework::ReturnLifespan(){
     return lifespan;
+}
+
+bool Firework::ReturnZeroVelocity(){
+    if(velocity.y() <= 0)
+        return true;
+    else
+        return false;
 }

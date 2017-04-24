@@ -21,6 +21,8 @@
 #include <QLabel>
 
 #include <QVector>
+#include <vector>
+#include <deque>
 #include <QtCore/QObject>
 #include <QTimer>
 #include <QKeyEvent>
@@ -28,38 +30,37 @@
 #include <QDebug>
 #include "firework.h"
 
+#include <QThread>
+
 using namespace std;
 
 class Scene : public QObject{
     Q_OBJECT
 
-
-    //void mousePressEvent(QMouseEvent *event) override;
-
 public:
-    void CreateWindow();
-    ///WINDOW ^^
-
     void AddFireworks(Qt3DCore::QEntity *rootEntity, int i);
     ~Scene();
-    Scene();
-    void    keyPressEvent(QKeyEvent *e);
-    void BOOM();
+    Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON);
+    void BOOM(Firework *i);
     void AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i);
+
 
 public slots:
     void AddFirework();
     void update();
+    void AUTO_MODE();
 
 private:
-    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
-    QPushButton *AddElement;
     Qt3DCore::QEntity *rootEntity;
+    QPushButton *AddElementBoxT;
+    QCheckBox *START;
 
-    QVector<Firework*> V_Fireworks;
-    QVector<Firework*> V_BoomedFireworks;
+    static void usleep(unsigned long usecs){QThread::usleep(usecs);}
+
+    list<Firework*> V_Fireworks;
 
     Firework *fire;
+
 };
 
 #endif // SCENE_H
