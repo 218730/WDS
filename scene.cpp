@@ -31,7 +31,7 @@ void Scene::AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i){
 }
 
 void Scene::AddFirework(){
-    if(V_Fireworks.size()*20 < 900)
+    if(V_Fireworks.size()*25 < 900)
     AddFireworks(rootEntity, 1);
 }
 

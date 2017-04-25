@@ -66,6 +66,7 @@ private:
     bool YOUCANDELETE = false;
     bool YOUCANDELETEROOT = false;
 
+    //Kolor fajerwerkow
     int h_color;
     int s_color;
     int v_color;

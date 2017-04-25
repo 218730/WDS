@@ -25,7 +25,7 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
     boomed = true;
-    velocity = QVector3D(uni(rng)%2-1, uni(rng)%2-1, uni(rng)%2-1);
+    velocity = QVector3D(uni(rng)%1-0.5, uni(rng)%1-0.5, uni(rng)%1-0.5);
     velocity = velocity * QVector3D(uni(rng)%5+1,uni(rng)%5+1,uni(rng)%5+1);
 
     acceleration = QVector3D(0, 0, 0);
@@ -119,7 +119,6 @@ float Firework::map(int lifespan_t){
     float output = 1 + slope * (lifespan_t - 255);
 
     return output;
-
 }
 
 void Firework::SetAndAdd(){

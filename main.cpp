@@ -73,12 +73,25 @@ int main(int argc, char *argv[])
     //Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
     Qt3DExtras::Qt3DWindow view;
 
-    view.defaultFrameGraph()->setClearColor(QColor(qRgba(0, 0, 0,25)));
+
+
+    QColor b_color(0,0,0,60);
+    b_color.setAlpha(60);
+
+    view.defaultFrameGraph()->setClearColor(b_color);
+
+    //QOpenGLWidget *container = new QOpenGLWidget();
+    //container->createWindowContainer(&view);
+
     QWidget *container = QWidget::createWindowContainer(&view);
+    container->setAttribute(Qt::WA_TranslucentBackground, true);
+    container->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
+    container->setWindowOpacity(0.5);
+
     QSize screenSize = view.screen()->size();
     container->setMinimumSize(QSize(200, 100));
     container->setMaximumSize(screenSize);
-    container->setStyleSheet("background:transparent");
+    //container->setStyleSheet("background:transparent");
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
@@ -87,13 +100,13 @@ int main(int argc, char *argv[])
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-    widget->setWindowTitle(QStringLiteral("Fireworks v.0.44"));
+    widget->setWindowTitle(QStringLiteral("Fireworks v.0.46"));
 
     Qt3DInput::QInputAspect *input = new Qt3DInput::QInputAspect;
     view.registerAspect(input);
 
     // Root entity
-    Qt3DCore::QEntity *sceneRoot;
+    static Qt3DCore::QEntity *sceneRoot;
     sceneRoot = new Qt3DCore::QEntity();
 
     // Camera
@@ -104,14 +117,14 @@ int main(int argc, char *argv[])
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
     cameraEntity->setViewCenter(QVector3D(0, 90, 0));
 
-    /*Qt3DCore::QEntity *lightEntity = new Qt3DCore::QEntity(rootEntity);
+    Qt3DCore::QEntity *lightEntity = new Qt3DCore::QEntity(sceneRoot);
     Qt3DRender::QPointLight *light = new Qt3DRender::QPointLight(lightEntity);
-    light->setColor("red");
-    light->setIntensity(4);
+    light->setColor("white");
+    light->setIntensity(0.5);
     lightEntity->addComponent(light);
     Qt3DCore::QTransform *lightTransform = new Qt3DCore::QTransform(lightEntity);
     lightTransform->setTranslation(cameraEntity->position());
-    lightEntity->addComponent(lightTransform);*/
+    lightEntity->addComponent(lightTransform);
 
     // For camera controls
     Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(sceneRoot);
@@ -161,28 +174,41 @@ int main(int argc, char *argv[])
     QPushButton *AddElementDefPos;
     AddElementDefPos = new QPushButton("Add New Element - defined pos.");
 
+    QGroupBox *gridGroupBoxPresets;
+    gridGroupBoxPresets = new QGroupBox("Presets");
+    QGridLayout *PresetsLayout = new QGridLayout;
+    QCheckBox *Preset1 = new QCheckBox("Preset 1");
+    QCheckBox *Preset2 = new QCheckBox("Preset 2");
+    QCheckBox *Preset3 = new QCheckBox("Preset 3");
+    PresetsLayout->addWidget(Preset1);
+    PresetsLayout->addWidget(Preset2);
+    PresetsLayout->addWidget(Preset3);
+    gridGroupBoxPresets->setLayout(PresetsLayout);
+
     QGroupBox *gridGroupBox;
     gridGroupBox = new QGroupBox(("Define your position:"));
     QGridLayout *layout = new QGridLayout;
     QLabel *labels[3];
+        labels[0] = new QLabel("x");
+        labels[1] = new QLabel("y");
+        labels[2] = new QLabel("z");
     QLineEdit *lineEdits[3];
     for (int i = 0; i < 3; ++i) {
-        labels[i] = new QLabel("xyz");
         lineEdits[i] = new QLineEdit;
         layout->addWidget(labels[i], i + 1, 0);
         layout->addWidget(lineEdits[i], i + 1, 1);
     }
-    layout->setColumnStretch(1, 10);
+    //layout->setColumnStretch(1, 10);
     //layout->setColumnStretch(2, 20);
     layout->addWidget(AddElementDefPos);
     gridGroupBox->setLayout(layout);
 
     vLayout->addWidget(label);
     vLayout->addWidget(START_BUTTON);
+    vLayout->addWidget(AddElementBox);
     vLayout->addWidget(AddElementRandPos);
     vLayout->addWidget(gridGroupBox);
-    vLayout->addWidget(AddElementBox);
-
+    vLayout->addWidget(gridGroupBoxPresets);
 
 /*
     Qt3DExtras::QPlaneMesh *planeEntity = new Qt3DExtras::QPlaneMesh(sceneRoot);

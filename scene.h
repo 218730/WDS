@@ -1,5 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
+
 #include <QGuiApplication>
 #include <QtWidgets/QApplication>
 #include <Qt3DExtras/qt3dwindow.h>
