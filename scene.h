@@ -45,6 +45,7 @@ public:
     void BOOM(Firework *i);
     void AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i);
 
+    static void usleep(unsigned long usecs){QThread::usleep(usecs);}
 
 public slots:
     void AddFirework();
@@ -56,12 +57,7 @@ private:
     QPushButton *AddElementBoxT;
     QCheckBox *START;
 
-    static void usleep(unsigned long usecs){QThread::usleep(usecs);}
-
     list<Firework*> V_Fireworks;
-
-    Firework *fire;
-
 };
 
 #endif // SCENE_H

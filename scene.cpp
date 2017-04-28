@@ -16,6 +16,8 @@ Scene::~Scene(){
             qDebug() << V_Fireworks.size();
         }
     }
+    delete AddElementBoxT;
+    delete START;
 }
 
 void Scene::AddFireworks(Qt3DCore::QEntity *rootEntity, int i){
@@ -31,12 +33,13 @@ void Scene::AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i){
 }
 
 void Scene::AddFirework(){
-    if(V_Fireworks.size()*25 < 900)
+    if(V_Fireworks.size()*6 < 900)
     AddFireworks(rootEntity, 1);
+    //usleep(8000);
 }
 
 void Scene::AUTO_MODE(){
-  if(AddElementBoxT->text() == "AUTO_MODE IS ON"){
+  if(AddElementBoxT->text() == "ON"){
     if(V_Fireworks.size() < 900){
         AddFirework();
     }

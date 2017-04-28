@@ -25,6 +25,9 @@
 #include <Qt3DExtras/QPlaneMesh>
 #include <Qt3DExtras/QNormalDiffuseSpecularMapMaterial>
 #include <Qt3DRender/QTextureImage>
+
+#include <QtOpenGL/QGLWidget>
+
 /*
 #include <Qt3DCore/qentity.h>
 #include <Qt3DRender/qcameralens.h>
@@ -52,6 +55,9 @@ TODO:
 - Rozwaz czy wprowadzenie listy na rootFireworks to zly pomysl - 1->0-20 - 2->21-41
     - dwie petle?
     - (i*20-29) - (i*20)
+
+- sleep przy dodawaniu
+-
 */
 
 QT_BEGIN_NAMESPACE
@@ -80,8 +86,11 @@ int main(int argc, char *argv[])
 
     view.defaultFrameGraph()->setClearColor(b_color);
 
-    //QOpenGLWidget *container = new QOpenGLWidget();
+    //QWidget *container = QGLWidget::createWindowContainer(&view);
     //container->createWindowContainer(&view);
+
+    /*QOpenGLWidget *container = new QOpenGLWidget();
+    container->createWindowContainer(&view);*/
 
     QWidget *container = QWidget::createWindowContainer(&view);
     container->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -100,7 +109,7 @@ int main(int argc, char *argv[])
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-    widget->setWindowTitle(QStringLiteral("Fireworks v.0.46"));
+    widget->setWindowTitle(QStringLiteral("Fireworks v.0.47"));
 
     Qt3DInput::QInputAspect *input = new Qt3DInput::QInputAspect;
     view.registerAspect(input);
@@ -134,17 +143,31 @@ int main(int argc, char *argv[])
     view.setRootEntity(sceneRoot);
 
     // Create control widgets
+    QGroupBox *gridGroupBoxAutoMode;
+    gridGroupBoxAutoMode = new QGroupBox("AUTO_MODE:");
+    QGridLayout *AutoModeLayout = new QGridLayout;
+    QLabel *AMlabels[1];
+    QLineEdit *AMlineEdits[1];
+    AMlabels[0] = new QLabel("max. particles on the scene: ");
+    AMlineEdits[0] = new QLineEdit();
+
     QPushButton *AddElementBox;
     AddElementBox = new QPushButton();
+    AutoModeLayout->addWidget(AMlabels[0]);
+    AutoModeLayout->addWidget(AMlineEdits[0]);
+    AutoModeLayout->addWidget(AddElementBox);
+
+    gridGroupBoxAutoMode->setLayout(AutoModeLayout);
+
     QStateMachine machine;
 
     QState *off = new QState();
-        off->assignProperty(AddElementBox, "text", "AUTO_MODE IS OFF");
+        off->assignProperty(AddElementBox, "text", "OFF");
         off->setObjectName("off");
 
     QState *on = new QState();
         on->setObjectName("on");
-        on->assignProperty(AddElementBox, "text", "AUTO_MODE IS ON");
+        on->assignProperty(AddElementBox, "text", "ON");
 
      off->addTransition(AddElementBox, SIGNAL(clicked()), on);
      on->addTransition(AddElementBox, SIGNAL(clicked()), off);
@@ -158,7 +181,7 @@ int main(int argc, char *argv[])
 
 
     QLabel *label;
-    string buffer_string = "Welcome to the Fireworks Symulator!";
+    string buffer_string = "Fireworks Symulator";
     const char* buffer = buffer_string.c_str();
     label = new QLabel(buffer);
     label->setText(buffer);
@@ -169,13 +192,13 @@ int main(int argc, char *argv[])
     START_BUTTON->setStyleSheet("margin-left:50%; margin-right:50%;");
 
     QPushButton *AddElementRandPos;
-    AddElementRandPos = new QPushButton("Add New Element - random pos.");
+    AddElementRandPos = new QPushButton("Add new element - random pos.");
 
     QPushButton *AddElementDefPos;
-    AddElementDefPos = new QPushButton("Add New Element - defined pos.");
+    AddElementDefPos = new QPushButton("Add new element");
 
     QGroupBox *gridGroupBoxPresets;
-    gridGroupBoxPresets = new QGroupBox("Presets");
+    gridGroupBoxPresets = new QGroupBox("Presets:");
     QGridLayout *PresetsLayout = new QGridLayout;
     QCheckBox *Preset1 = new QCheckBox("Preset 1");
     QCheckBox *Preset2 = new QCheckBox("Preset 2");
@@ -205,8 +228,8 @@ int main(int argc, char *argv[])
 
     vLayout->addWidget(label);
     vLayout->addWidget(START_BUTTON);
-    vLayout->addWidget(AddElementBox);
     vLayout->addWidget(AddElementRandPos);
+    vLayout->addWidget(gridGroupBoxAutoMode);
     vLayout->addWidget(gridGroupBox);
     vLayout->addWidget(gridGroupBoxPresets);
 

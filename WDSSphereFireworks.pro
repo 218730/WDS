@@ -6,7 +6,7 @@ QT += 3dcore 3drender 3dinput 3dextras
 QT += gui
 QT += widgets
 
-CONFIG += c++11
+CONFIG += c++11 pedantic
 
 TARGET = WDSSphereFireworks
 # CONFIG += console

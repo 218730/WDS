@@ -63,7 +63,7 @@ void Firework::destroy(){
             YOUCANDELETEROOT = true;
         }
 }
-
+/*
 void Firework::trail(){
     QVector3D pos_t;
     pos_t.setY(pos.y() - velocity.y());
@@ -75,7 +75,7 @@ void Firework::trail(){
     sphereTransform->setTranslation(QVector3D(pos.x(), pos_t.y(), pos.z()));
     m_sphereEntity->addComponent(sphereTransform);
 
-}
+}*/
 
 void Firework::update(){
     if(!boomed){

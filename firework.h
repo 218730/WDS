@@ -36,7 +36,7 @@ public:
     bool ReturnZeroVelocity();
     bool CanIDelete();
     bool CanIDeleteRoot();
-    void trail();
+   // void trail();
     float map(int lifespan_t);
 
 public slots:
