@@ -33,6 +33,18 @@
 
 #include <QThread>
 
+QT_BEGIN_NAMESPACE
+class QAction;
+class QDialogButtonBox;
+class QGroupBox;
+class QLabel;
+class QLineEdit;
+class QMenu;
+class QMenuBar;
+class QPushButton;
+class QTextEdit;
+QT_END_NAMESPACE
+
 using namespace std;
 
 class Scene : public QObject{
@@ -49,15 +61,26 @@ public:
 
 public slots:
     void AddFirework();
+    void AddFireworkDefPos();
     void update();
     void AUTO_MODE();
+    void DefPosX(const QString &newValue);
+    void DefPosY(const QString &newValue);
+    void DefPosZ(const QString &newValue);
+
 
 private:
     Qt3DCore::QEntity *rootEntity;
     QPushButton *AddElementBoxT;
     QCheckBox *START;
-
+    //QList<QLineEdit*> *lineEditsListT;
+    //lineEditsT[0] = new QLineEdit;
+    //lineEditsT[1] = new QLineEdit;
+    //lineEditsT[2] = new QLineEdit;
     list<Firework*> V_Fireworks;
+    QString DefX;
+    QString DefY;
+    QString DefZ;
 };
 
 #endif // SCENE_H

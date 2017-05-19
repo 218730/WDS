@@ -16,8 +16,6 @@
 
 #include <QThread>
 
-#include "window.h"
-
 #include <random>
 
 class Firework : public QObject{
@@ -25,10 +23,11 @@ class Firework : public QObject{
 
 public:
     Firework(Qt3DCore::QEntity *rootEntity);
+    Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, bool boomed_t);
     Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed);
     ~Firework();
     void destroy();
-    void SetAndAdd();
+    void SetAndAdd(Qt3DCore::QEntity *rootEntity);
     bool CheckIfDead();
     QVector3D ReturnPosition();
     void ApplyForce();
@@ -45,9 +44,7 @@ public slots:
     void updateBOOM();
 
 private:
-    Qt3DCore::QEntity *m_rootEntity = new Qt3DCore::QEntity();
-    Qt3DCore::QEntity *m_sphereEntity = new Qt3DCore::QEntity(m_rootEntity);
-
+    Qt3DCore::QEntity *m_sphereEntity;
     Qt3DCore::QTransform *sphereTransform = new Qt3DCore::QTransform();
     Qt3DExtras::QSphereMesh *sphereMesh = new Qt3DExtras::QSphereMesh();
     Qt3DExtras::QPhongAlphaMaterial *sphereMaterial = new Qt3DExtras::QPhongAlphaMaterial();

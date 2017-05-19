@@ -5,7 +5,13 @@ Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox
          AddElementBoxT(AddElementBox),
          START(START_BUTTON)
 {
+    //lineEditsT[0] = lineEdits[0];
+    //lineEditsT[1] = lineEdits[1];
+    //lineEditsT[2] = lineEdits[2];
+//QString temp11 = lineEditsListT.at(0);
+    //(&lineEditsT)->text().isEmpty();
 
+    //(**lineEdits).setText("4");
 }
 
 Scene::~Scene(){
@@ -18,6 +24,18 @@ Scene::~Scene(){
     }
     delete AddElementBoxT;
     delete START;
+}
+
+void Scene::DefPosX(const QString &newValue){
+    DefX = newValue;
+}
+
+void Scene::DefPosY(const QString &newValue){
+    DefY = newValue;
+}
+
+void Scene::DefPosZ(const QString &newValue){
+    DefZ = newValue;
 }
 
 void Scene::AddFireworks(Qt3DCore::QEntity *rootEntity, int i){
@@ -33,9 +51,15 @@ void Scene::AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i){
 }
 
 void Scene::AddFirework(){
-    if(V_Fireworks.size()*6 < 900)
+    if(V_Fireworks.size()*20 < 900)
     AddFireworks(rootEntity, 1);
     //usleep(8000);
+}
+
+void Scene::AddFireworkDefPos(){
+    if(DefX != NULL && DefY != NULL && DefZ != NULL)
+        if(V_Fireworks.size()*20 < 900)
+            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), false));
 }
 
 void Scene::AUTO_MODE(){
@@ -55,6 +79,8 @@ void Scene::BOOM(Firework *i){
 
 void Scene::update(){
     if(START->checkState() == Qt::Checked){
+        //qDebug() << (lineEditsT[0]);
+
         AUTO_MODE();
 
         if(V_Fireworks.size() > 0){

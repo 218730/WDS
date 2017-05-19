@@ -1,7 +1,6 @@
 #include "firework.h"
 
 Firework::Firework(Qt3DCore::QEntity *rootEntity)
-         : m_rootEntity(rootEntity)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
@@ -15,11 +14,25 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity)
     z = uni(rng)%400-200;
     pos = QVector3D(x, -4.0f, z);
 
-    SetAndAdd();
+    SetAndAdd(rootEntity);
+}
+
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, bool boomed_t = false)
+{
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni; // guaranteed unbiased
+
+    boomed = boomed_t;
+    velocity = QVector3D(0, 10, 0);
+    acceleration = QVector3D(0, 0, 0);
+    gravity = QVector3D(0, -0.2, 0);
+
+    pos = position;
+
+    SetAndAdd(rootEntity);
 }
 
 Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed)
-         : m_rootEntity(rootEntity)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
@@ -33,17 +46,15 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed)
     gravity = QVector3D(0, -0.2, 0);
     lifespan = 255;
 
-    SetAndAdd();
+    SetAndAdd(rootEntity);
 }
 
 Firework::~Firework()
 {
-    //m_rootEntity = nullptr;
     delete sphereMaterial;
     delete sphereMesh;
     delete sphereTransform;
     delete m_sphereEntity;
-    //delete m_rootEntity;     // - Czemu nie można usunąć?
 }
 
 void Firework::move(){
@@ -121,10 +132,12 @@ float Firework::map(int lifespan_t){
     return output;
 }
 
-void Firework::SetAndAdd(){
+void Firework::SetAndAdd(Qt3DCore::QEntity *rootEntity){
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
     //int xyz = random()%2;
+
+    m_sphereEntity = new Qt3DCore::QEntity(rootEntity);
 
     h_color = uni(rng)%255;
     s_color = uni(rng)%255;
