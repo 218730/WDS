@@ -1,10 +1,11 @@
 #include "scene.h"
 
-Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON)
+Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *Preset1)
        : rootEntity(sceneRoot),
          AddElementBoxT(AddElementBox),
-         START(START_BUTTON)
-{
+         START(START_BUTTON),
+         Preset1T(Preset1)
+{    
     //lineEditsT[0] = lineEdits[0];
     //lineEditsT[1] = lineEdits[1];
     //lineEditsT[2] = lineEdits[2];
@@ -12,6 +13,7 @@ Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox
     //(&lineEditsT)->text().isEmpty();
 
     //(**lineEdits).setText("4");
+
 }
 
 Scene::~Scene(){
@@ -38,43 +40,61 @@ void Scene::DefPosZ(const QString &newValue){
     DefZ = newValue;
 }
 
+void Scene::MaxParticles(const QString &newValue){
+    maxP = newValue;
+}
+
 void Scene::AddFireworks(Qt3DCore::QEntity *rootEntity, int i){
     for(int j = 0; j < i; j++){
-    V_Fireworks.push_back(new Firework(rootEntity));
+    V_Fireworks.push_back(new Firework(rootEntity, Preset1T));
     }
 }
 
 void Scene::AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i){
     for(int j = 0; j < i; j++){
-        V_Fireworks.push_back(new Firework(rootEntity, pos));
+        V_Fireworks.push_back(new Firework(rootEntity, pos, Preset1T));
     }
 }
 
 void Scene::AddFirework(){
-    if(V_Fireworks.size()*20 < 900)
-    AddFireworks(rootEntity, 1);
-    //usleep(8000);
+    if(maxP != NULL){
+        if(V_Fireworks.size()*20 < maxP.toUInt()){
+            AddFireworks(rootEntity, 1);}
+    }
+    else if(V_Fireworks.size()*20 < 900){
+        AddFireworks(rootEntity, 1);}
 }
 
 void Scene::AddFireworkDefPos(){
     if(DefX != NULL && DefY != NULL && DefZ != NULL)
         if(V_Fireworks.size()*20 < 900)
-            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), false));
+            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), Preset1T, false));
+    iter = 64;
 }
 
 void Scene::AUTO_MODE(){
   if(AddElementBoxT->text() == "ON"){
-    if(V_Fireworks.size() < 900){
+    AddElementBoxT->setStyleSheet("background-color: green");
+    //if(V_Fireworks.size() < maxP.toInt()){
         AddFirework();
-    }
+    //}
+  }
+  else{
+      AddElementBoxT->setStyleSheet("background-color: red");
   }
 }
 
 void Scene::BOOM(Firework *i){
-    if(V_Fireworks.size() > 0)
+    if(V_Fireworks.size() > 0){
         if((i)->ReturnZeroVelocity() && (i)->CheckIfDead() == false){
             AddBOOM(rootEntity, (i)->ReturnPosition(), 20);
         }
+        if((i)->ReturnZeroVelocity() && (i)->CheckIfDead() == true && Preset1T->checkState() == Qt::Checked && i->phaseB == false){
+            if(iter-- >= 0)
+                AddBOOM(rootEntity, (i)->ReturnPosition(), 20);
+            usleep(100);
+        }
+    }
 }
 
 void Scene::update(){

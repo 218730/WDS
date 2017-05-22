@@ -23,8 +23,6 @@ Canvas::~Canvas(){
     delete AMlineEdits[0];
     delete AddElementBox;
     delete machine;
-
-
 }
 
 
@@ -88,6 +86,7 @@ AMlineEdits[0] = new QLineEdit();
 AutoModeLayout->addWidget(AMlabels[0]);
 AutoModeLayout->addWidget(AMlineEdits[0]);
 AutoModeLayout->addWidget(AddElementBox);
+AddElementBox->setStyleSheet("background-color: red");
 
 gridGroupBoxAutoMode->setLayout(AutoModeLayout);
 
@@ -222,7 +221,7 @@ lineEditsList.append(lineEdits[0]);
 lineEditsList.append(lineEdits[1]);
 lineEditsList.append(lineEdits[2]);
 
-Scene *window = new Scene(sceneRoot, AddElementBox, START_BUTTON);
+Scene *window = new Scene(sceneRoot, AddElementBox, START_BUTTON, Preset1);
 
 QObject::connect(AddElementRandPos, SIGNAL(clicked()), window, SLOT(AddFirework()));
 
@@ -232,6 +231,9 @@ QObject::connect(lineEdits[0], SIGNAL(textChanged(const QString &)), window, SLO
 QObject::connect(lineEdits[1], SIGNAL(textChanged(const QString &)), window, SLOT(DefPosY(const QString &)));
 QObject::connect(lineEdits[2], SIGNAL(textChanged(const QString &)), window, SLOT(DefPosZ(const QString &)));
 
+QObject::connect(AMlineEdits[0], SIGNAL(textChanged(const QString &)), window, SLOT(MaxParticles(const QString &)));
+
+
 QTimer *timer = new QTimer();
 QObject::connect(timer, SIGNAL(timeout()), window, SLOT(update()));
 timer->start(1000 / 33);
@@ -240,4 +242,5 @@ timer->start(1000 / 33);
 
 widget->show();
 widget->resize(1200, 600);
+
 }

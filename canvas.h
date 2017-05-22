@@ -42,11 +42,12 @@ class QPushButton;
 class QTextEdit;
 QT_END_NAMESPACE
 
-//class Canvas : public QOpenGLWidget, protected QOpenGLFunctions{
-class Canvas{
+class Canvas : public QOpenGLWidget, protected QOpenGLFunctions{
+//class Canvas{
 private:
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
-    QWidget *container = QWidget::createWindowContainer(view);
+    QWidget *container = QWidget::createWindowContainer(view);  //DEFAULT
+
     //QWidget *container = QGLWidget::createWindowContainer(view);
     //QOpenGLWidget *container = new QOpenGLWidget();
     QSize screenSize;

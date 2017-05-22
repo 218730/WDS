@@ -18,13 +18,17 @@
 
 #include <random>
 
+#include <QtOpenGL/QGLWidget>
+
+#include <QtWidgets/QCheckBox>
+
 class Firework : public QObject{
     Q_OBJECT
 
 public:
-    Firework(Qt3DCore::QEntity *rootEntity);
-    Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, bool boomed_t);
-    Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed);
+    Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1);
+    Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, bool boomed_t);
+    Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1);
     ~Firework();
     void destroy();
     void SetAndAdd(Qt3DCore::QEntity *rootEntity);
@@ -37,6 +41,12 @@ public:
     bool CanIDeleteRoot();
    // void trail();
     float map(int lifespan_t);
+    void Preset1();
+    void moveP1a();
+    bool ReturnphaseB();
+
+    bool phaseB = true;
+    int it=2;
 
 public slots:
     void move();
@@ -70,6 +80,10 @@ private:
     int a_color;
 
     std::random_device rd;     // only used once to initialise (seed) engine
+
+    QSurfaceFormat format;
+
+    QCheckBox *temp_preset1;
 
 };
 

@@ -33,6 +33,7 @@
 
 #include <QThread>
 
+
 QT_BEGIN_NAMESPACE
 class QAction;
 class QDialogButtonBox;
@@ -53,7 +54,7 @@ class Scene : public QObject{
 public:
     void AddFireworks(Qt3DCore::QEntity *rootEntity, int i);
     ~Scene();
-    Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON);
+    Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *Preset1);
     void BOOM(Firework *i);
     void AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i);
 
@@ -67,12 +68,13 @@ public slots:
     void DefPosX(const QString &newValue);
     void DefPosY(const QString &newValue);
     void DefPosZ(const QString &newValue);
-
+    void MaxParticles(const QString &newValue);
 
 private:
     Qt3DCore::QEntity *rootEntity;
     QPushButton *AddElementBoxT;
     QCheckBox *START;
+    QCheckBox *Preset1T;
     //QList<QLineEdit*> *lineEditsListT;
     //lineEditsT[0] = new QLineEdit;
     //lineEditsT[1] = new QLineEdit;
@@ -81,6 +83,8 @@ private:
     QString DefX;
     QString DefY;
     QString DefZ;
+    QString maxP;
+    int iter = 64;
 };
 
 #endif // SCENE_H

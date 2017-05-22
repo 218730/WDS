@@ -1,6 +1,7 @@
 #include "firework.h"
 
-Firework::Firework(Qt3DCore::QEntity *rootEntity)
+//Pozycja randomowa
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
@@ -14,10 +15,13 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity)
     z = uni(rng)%400-200;
     pos = QVector3D(x, -4.0f, z);
 
+    temp_preset1 = Preset1;
+
     SetAndAdd(rootEntity);
 }
 
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, bool boomed_t = false)
+//Zdefiniowana pozycja
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, bool boomed_t = false)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
@@ -29,24 +33,31 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, bool boome
 
     pos = position;
 
+    temp_preset1 = Preset1;
+
     SetAndAdd(rootEntity);
+
 }
 
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed)
+//Wybuch
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
     boomed = true;
-    velocity = QVector3D(uni(rng)%1-0.5, uni(rng)%1-0.5, uni(rng)%1-0.5);
-    velocity = velocity * QVector3D(uni(rng)%5+1,uni(rng)%5+1,uni(rng)%5+1);
+    velocity = QVector3D(uni(rng)%2-0.5, uni(rng)%2-0.5, uni(rng)%2-0.5);
+    velocity = velocity * QVector3D(uni(rng)%4+1,uni(rng)%4+1,uni(rng)%4+1);
 
     acceleration = QVector3D(0, 0, 0);
     pos = posboomed;
     gravity = QVector3D(0, -0.2, 0);
     lifespan = 255;
 
+    temp_preset1 = Preset1;
+
     SetAndAdd(rootEntity);
+
 }
 
 Firework::~Firework()
@@ -66,6 +77,7 @@ void Firework::move(){
     //trail();
 }
 
+
 void Firework::destroy(){
     if(velocity.y() <= 0 && !boomed){
             m_sphereEntity->removeComponent(sphereMaterial);
@@ -74,6 +86,7 @@ void Firework::destroy(){
             YOUCANDELETEROOT = true;
         }
 }
+
 /*
 void Firework::trail(){
     QVector3D pos_t;
@@ -85,18 +98,68 @@ void Firework::trail(){
     sphereTransform->setScale3D(QVector3D(0.98, 0.98, 0.98));
     sphereTransform->setTranslation(QVector3D(pos.x(), pos_t.y(), pos.z()));
     m_sphereEntity->addComponent(sphereTransform);
-
 }*/
 
 void Firework::update(){
-    if(!boomed){
+    if(!boomed && (temp_preset1->checkState() == Qt::Unchecked || temp_preset1->checkState() == Qt::Checked)){
         ApplyForce();
         move();
         destroy();
     }
-    else if(boomed){
+    else if(boomed && temp_preset1->checkState() == Qt::Unchecked){
         updateBOOM();
     }
+    /*else if(!boomed && temp_preset1->checkState() == Qt::Checked){
+
+    }*/
+    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == false){
+         updateBOOM();
+    }
+    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == true){
+         Preset1();
+    }
+
+}
+
+void Firework::moveP1a(){
+    velocity = velocity + acceleration;
+    pos.setX(pos.x() + velocity.x());
+    pos.setZ(pos.z() + velocity.z());
+    pos.setY(pos.y() + velocity.y()/3);
+    acceleration = acceleration*0;
+
+    sphereTransform->setTranslation(QVector3D(pos.x(), pos.y(), pos.z()));
+}
+
+void Firework::Preset1(){
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni; // guaranteed unbiased
+
+        velocity = velocity * QVector3D(0.90, 0.90, 0.90);
+        sphereTransform->setScale3D(sphereTransform->scale3D() * QVector3D(0.98, 0.98, 0.98));
+
+    ApplyForce();
+    moveP1a();
+
+    lifespan -= 5;
+    if(lifespan <= 0){
+        lifespan = 0;}
+
+    sphereMaterial->setAlpha(map(lifespan)); // 0 - znika // 1 - pelna widocznosc ---------- RGBA 0 - transparent // 255 - pelna widocznosc
+
+    if(lifespan <= 0){
+        sphereTransform->setScale3D(QVector3D(0, 0, 0));
+
+        m_sphereEntity->removeComponent(sphereMaterial);
+        m_sphereEntity->removeComponent(sphereTransform);
+        m_sphereEntity->removeComponent(sphereMesh);
+        phaseB = false;
+        YOUCANDELETE = true;
+    }
+}
+
+bool Firework::ReturnphaseB(){
+    return phaseB;
 }
 
 void Firework::updateBOOM(){
@@ -121,6 +184,7 @@ void Firework::updateBOOM(){
         m_sphereEntity->removeComponent(sphereMaterial);
         m_sphereEntity->removeComponent(sphereTransform);
         m_sphereEntity->removeComponent(sphereMesh);
+        phaseB = false;
         YOUCANDELETE = true;
     }
 }
