@@ -42,6 +42,14 @@ class QPushButton;
 class QTextEdit;
 QT_END_NAMESPACE
 
+
+/**
+ * \brief Klasa Canvas
+ *
+ * Klasa definiująca scenę dla fajerwerków oraz panel użytkownika.
+ *
+ * \version alfa
+ */
 class Canvas : public QOpenGLWidget, protected QOpenGLFunctions{
 //class Canvas{
 private:
@@ -78,8 +86,17 @@ private:
 
 
 public:
+    /**
+     * Konstruktor.
+     */
     Canvas();
+    /**
+     * Dekonstruktor.
+     */
     ~Canvas();
+    /**
+     * Metoda tworząca okno programu wraz z panelem użytkownika.
+     */
     void Create();
 };
 

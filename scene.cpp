@@ -67,9 +67,9 @@ void Scene::AddFirework(){
 
 void Scene::AddFireworkDefPos(){
     if(DefX != NULL && DefY != NULL && DefZ != NULL)
-        if(V_Fireworks.size()*20 < 900)
-            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), Preset1T, false));
-    iter = 64;
+        if(V_Fireworks.size()*20 < 900){
+            iter = 64;
+            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), Preset1T, false));}
 }
 
 void Scene::AUTO_MODE(){
@@ -89,7 +89,7 @@ void Scene::BOOM(Firework *i){
         if((i)->ReturnZeroVelocity() && (i)->CheckIfDead() == false){
             AddBOOM(rootEntity, (i)->ReturnPosition(), 20);
         }
-        if((i)->ReturnZeroVelocity() && (i)->CheckIfDead() == true && Preset1T->checkState() == Qt::Checked && i->phaseB == false){
+        if((i)->ReturnZeroVelocity() && (i)->CheckIfDead() == true && Preset1T->checkState() == Qt::Checked && i->ReturnphaseB() == false){
             if(iter-- >= 0)
                 AddBOOM(rootEntity, (i)->ReturnPosition(), 20);
             usleep(100);
