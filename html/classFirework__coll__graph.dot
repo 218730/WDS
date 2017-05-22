@@ -1,0 +1,6 @@
+digraph "Firework"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{Firework\n||+ Firework()\l+ Firework()\l+ Firework()\l+ ~Firework()\l+ destroy()\l+ SetAndAdd()\l+ CheckIfDead()\l+ ReturnPosition()\l+ ApplyForce()\l+ ReturnLifespan()\li 10 więcej...\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+}
