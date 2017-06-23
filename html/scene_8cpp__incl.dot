@@ -70,7 +70,11 @@ digraph "scene.cpp"
   Node27 -> Node31 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node31 [label="random",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node27 -> Node32 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node32 [label="QtOpenGL/QGLWidget",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node32 [label="math.h",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+  Node27 -> Node33 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node33 [label="QtOpenGL/QGLWidget",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node27 -> Node16 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node27 -> Node34 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node34 [label="QGeometryRenderer",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
   Node2 -> Node30 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }
