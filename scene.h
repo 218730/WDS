@@ -76,7 +76,7 @@ public:
      * \param START_BUTTON Przycisk odpowiadający za aktywację pętli aktualizującej scenę.
      * \param Preset1 Przycisk włączający predefiniowane zachowania fajerwerków nr 1
      */
-    Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *Preset1);
+    Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *TRAIL_SWITCH, QCheckBox *Preset1, QCheckBox *Preset2);
     /**
      * \brief Sprawdza czy można dodać wybuch.
      *
@@ -122,6 +122,7 @@ public slots:
      */
     void MaxParticles(const QString &newValue);
 
+
 private:
     static void usleep(unsigned long usecs){QThread::usleep(usecs);}
 
@@ -129,10 +130,9 @@ private:
     QPushButton *AddElementBoxT;
     QCheckBox *START;
     QCheckBox *Preset1T;
-    //QList<QLineEdit*> *lineEditsListT;
-    //lineEditsT[0] = new QLineEdit;
-    //lineEditsT[1] = new QLineEdit;
-    //lineEditsT[2] = new QLineEdit;
+    QCheckBox *Preset2T;
+    QCheckBox *TRAIL;
+
     list<Firework*> V_Fireworks;
     QString DefX;
     QString DefY;

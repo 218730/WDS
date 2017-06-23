@@ -1,46 +1,60 @@
 #include "firework.h"
 
 //Pozycja randomowa
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1)
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1, QCheckBox *Preset2)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
     boomed = false;
-    velocity = QVector3D(0, 10, 0);
+    if(Preset2->checkState() == Qt::Checked){
+        velocity = QVector3D(10, 15, 0);
+        gravity = QVector3D(-0.3, -0.2, 0);
+    }
+    else{
+        velocity = QVector3D(0, 10, 0);
+        gravity = QVector3D(0, -0.2, 0);}
     acceleration = QVector3D(0, 0, 0);
-    gravity = QVector3D(0, -0.2, 0);
 
     x = uni(rng)%400-200;
     z = uni(rng)%400-200;
     pos = QVector3D(x, -4.0f, z);
 
     temp_preset1 = Preset1;
+    temp_preset2 = Preset2;
 
     SetAndAdd(rootEntity);
 }
 
 //Zdefiniowana pozycja
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, bool boomed_t = false)
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, QCheckBox *Preset2, bool boomed_t = false)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
 
     boomed = boomed_t;
-    velocity = QVector3D(0, 10, 0);
+    if(Preset2->checkState() == Qt::Checked){
+        velocity = QVector3D(10, 15, 0);
+        gravity = QVector3D(-0.3, -0.2, 0);
+    }
+    else{
+        velocity = QVector3D(0, 10, 0);
+        gravity = QVector3D(0, -0.2, 0);}
+    //velocity = QVector3D(0, 10, 0);
     acceleration = QVector3D(0, 0, 0);
-    gravity = QVector3D(0, -0.2, 0);
+    //gravity = QVector3D(0, -0.2, 0);
 
     pos = position;
 
     temp_preset1 = Preset1;
+    temp_preset2 = Preset2;
 
     SetAndAdd(rootEntity);
 
 }
 
 //Wybuch
-Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1)
+Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1, QCheckBox *Preset2)
 {
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni; // guaranteed unbiased
@@ -55,6 +69,7 @@ Firework::Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox
     lifespan = 255;
 
     temp_preset1 = Preset1;
+    temp_preset2 = Preset2;
 
     SetAndAdd(rootEntity);
 
@@ -87,24 +102,17 @@ void Firework::destroy(){
         }
 }
 
-/*
-void Firework::trail(){
-    QVector3D pos_t;
-    pos_t.setY(pos.y() - velocity.y());
-
-    m_sphereEntity->addComponent(sphereMesh);
-    m_sphereEntity->addComponent(sphereMaterial);
-
-    sphereTransform->setScale3D(QVector3D(0.98, 0.98, 0.98));
-    sphereTransform->setTranslation(QVector3D(pos.x(), pos_t.y(), pos.z()));
-    m_sphereEntity->addComponent(sphereTransform);
-}*/
-
 void Firework::update(){
-    if(!boomed && (temp_preset1->checkState() == Qt::Unchecked || temp_preset1->checkState() == Qt::Checked)){
-        ApplyForce();
-        move();
-        destroy();
+    if(!boomed && (temp_preset1->checkState() == Qt::Unchecked || temp_preset1->checkState() == Qt::Checked) && (temp_preset2->checkState() == Qt::Unchecked || temp_preset2->checkState() == Qt::Checked)){
+        if(temp_preset2->checkState() == Qt::Checked){
+            ApplyForce();
+            moveP2();
+            destroy();
+        }
+        else{
+            ApplyForce();
+            move();
+            destroy();}
     }
     else if(boomed && temp_preset1->checkState() == Qt::Unchecked){
         updateBOOM();
@@ -112,12 +120,22 @@ void Firework::update(){
     /*else if(!boomed && temp_preset1->checkState() == Qt::Checked){
 
     }*/
-    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == false){
+    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == false && temp_preset2->checkState() == Qt::Unchecked){
          updateBOOM();
     }
-    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == true){
+    else if(boomed && temp_preset1->checkState() == Qt::Checked && phaseB == true && temp_preset2->checkState() == Qt::Unchecked){
          Preset1();
     }
+}
+
+void Firework::moveP2(){
+    velocity = velocity + acceleration;
+    pos.setX(pos.x() + sin(velocity.x()));
+    pos.setZ(pos.z() + cos(velocity.z()));
+    pos.setY(pos.y() + velocity.y()/3);
+    acceleration = acceleration*0;
+
+    sphereTransform->setTranslation(QVector3D(pos.x(), pos.y(), pos.z()));
 
 }
 
@@ -222,6 +240,7 @@ void Firework::SetAndAdd(Qt3DCore::QEntity *rootEntity){
     sphereTransform->setScale3D(QVector3D(2.0f,2.0f,2.0f));
     sphereTransform->setTranslation(pos);
 
+    //m_sphereEntity->setEnabled(true);
     m_sphereEntity->addComponent(sphereMesh);
     m_sphereEntity->addComponent(sphereMaterial);
     m_sphereEntity->addComponent(sphereTransform);

@@ -1,18 +1,14 @@
 #include "scene.h"
 
-Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *Preset1)
+Scene::Scene(Qt3DCore::QEntity *sceneRoot, QPushButton *AddElementBox, QCheckBox *START_BUTTON, QCheckBox *TRAIL_SWITCH, QCheckBox *Preset1, QCheckBox *Preset2)
        : rootEntity(sceneRoot),
          AddElementBoxT(AddElementBox),
          START(START_BUTTON),
-         Preset1T(Preset1)
+         Preset1T(Preset1),
+         Preset2T(Preset2),
+         TRAIL(TRAIL_SWITCH)
 {    
-    //lineEditsT[0] = lineEdits[0];
-    //lineEditsT[1] = lineEdits[1];
-    //lineEditsT[2] = lineEdits[2];
-//QString temp11 = lineEditsListT.at(0);
-    //(&lineEditsT)->text().isEmpty();
 
-    //(**lineEdits).setText("4");
 
 }
 
@@ -46,13 +42,13 @@ void Scene::MaxParticles(const QString &newValue){
 
 void Scene::AddFireworks(Qt3DCore::QEntity *rootEntity, int i){
     for(int j = 0; j < i; j++){
-    V_Fireworks.push_back(new Firework(rootEntity, Preset1T));
+    V_Fireworks.push_back(new Firework(rootEntity, Preset1T, Preset2T));
     }
 }
 
 void Scene::AddBOOM(Qt3DCore::QEntity *rootEntity, QVector3D pos, int i){
     for(int j = 0; j < i; j++){
-        V_Fireworks.push_back(new Firework(rootEntity, pos, Preset1T));
+        V_Fireworks.push_back(new Firework(rootEntity, pos, Preset1T, Preset2T));
     }
 }
 
@@ -69,7 +65,7 @@ void Scene::AddFireworkDefPos(){
     if(DefX != NULL && DefY != NULL && DefZ != NULL)
         if(V_Fireworks.size()*20 < 900){
             iter = 64;
-            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), Preset1T, false));}
+            V_Fireworks.push_back(new Firework(rootEntity, QVector3D(DefX.toInt(), DefY.toInt(), DefZ.toInt()), Preset1T, Preset2T, false));}
 }
 
 void Scene::AUTO_MODE(){
@@ -99,20 +95,39 @@ void Scene::BOOM(Firework *i){
 
 void Scene::update(){
     if(START->checkState() == Qt::Checked){
-        //qDebug() << (lineEditsT[0]);
+        if(TRAIL->checkState() == Qt::Unchecked){
+            //qDebug() << (lineEditsT[0]);
 
-        AUTO_MODE();
+            AUTO_MODE();
 
-        if(V_Fireworks.size() > 0){
-            for(list<Firework*>::iterator iter=V_Fireworks.begin(); iter != V_Fireworks.end(); iter++){
-                (*iter)->update();
-                BOOM(*iter);
+            if(V_Fireworks.size() > 0){
+                for(list<Firework*>::iterator iter=V_Fireworks.begin(); iter != V_Fireworks.end(); iter++){
+                    (*iter)->update();
+                    BOOM(*iter);
 
-                if(((*iter)->ReturnZeroVelocity() && !(*iter)->CheckIfDead() && (*iter)->CanIDeleteRoot()) ||
-                    ((*iter)->ReturnLifespan() <= 0 && (*iter)->CanIDelete())){
-                    delete (*iter);
-                    iter = V_Fireworks.erase(iter);
-                    qDebug() << V_Fireworks.size();
+                    if(((*iter)->ReturnZeroVelocity() && !(*iter)->CheckIfDead() && (*iter)->CanIDeleteRoot()) ||
+                        ((*iter)->ReturnLifespan() <= 0 && (*iter)->CanIDelete())){
+                        delete (*iter);
+                        iter = V_Fireworks.erase(iter);
+                        qDebug() << V_Fireworks.size();
+                    }
+                }
+            }
+        }
+        else if(TRAIL->checkState() == Qt::Checked){
+            AUTO_MODE();
+
+            if(V_Fireworks.size() > 0){
+                for(list<Firework*>::iterator iter=V_Fireworks.begin(); iter != V_Fireworks.end(); iter++){
+                    (*iter)->update();
+                    BOOM(*iter);
+
+                    if(((*iter)->ReturnZeroVelocity() && !(*iter)->CheckIfDead() && (*iter)->CanIDeleteRoot()) ||
+                        ((*iter)->ReturnLifespan() <= 50 && (*iter)->CanIDelete())){
+                        delete (*iter);
+                        iter = V_Fireworks.erase(iter);
+                        qDebug() << V_Fireworks.size();
+                    }
                 }
             }
         }

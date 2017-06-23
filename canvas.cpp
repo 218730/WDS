@@ -29,20 +29,26 @@ Canvas::~Canvas(){
 void Canvas::Create(){
 
 //Qt3DExtras::Qt3DWindow view;
-
-
+/*QSurfaceFormat format;
+format.setRenderableType(QSurfaceFormat::OpenGL);
+format.setProfile(QSurfaceFormat::CoreProfile);
+format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+format.setVersion(3, 3);
+*/
 
 QColor b_color(0,0,0,60);
 b_color.setAlpha(60);
 
+//view->setFormat(format);
 view->defaultFrameGraph()->setClearColor(b_color);
 
+///container->setWindowOpacity(50);
 //Dla OPENGL
 //container->createWindowContainer(view);
 
 container->setAttribute(Qt::WA_TranslucentBackground, true);
 container->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint );
-container->setWindowOpacity(0.5);
+container->setWindowOpacity(50);
 
 screenSize = view->screen()->size();
 container->setMinimumSize(QSize(200, 100));
@@ -57,7 +63,8 @@ hLayout->addLayout(vLayout);
 widget->setWindowTitle(QStringLiteral("Fireworks v.0.47"));
 
 view->registerAspect(input);
-
+view->setOpacity(0.50);
+//view->setFormat(format);
 // Camera
 
 cameraEntity->lens()->setPerspectiveProjection(60.0f, 16.0f/9.0f, 0.1f, 500.0f);
@@ -120,6 +127,12 @@ label = new QLabel(buffer);
 label->setText(buffer);
 label->setAlignment(Qt::AlignCenter);
 
+QPushButton *CLOSE_BUTTON;
+CLOSE_BUTTON = new QPushButton("Exit");
+
+QCheckBox *TRAIL_SWITCH;
+TRAIL_SWITCH = new QCheckBox("Trail activate - not working");
+
 QCheckBox *START_BUTTON;
 START_BUTTON = new QCheckBox("APPLY TIME");
 START_BUTTON->setStyleSheet("margin-left:50%; margin-right:50%;");
@@ -135,10 +148,8 @@ gridGroupBoxPresets = new QGroupBox("Presets:");
 QGridLayout *PresetsLayout = new QGridLayout;
 QCheckBox *Preset1 = new QCheckBox("Preset 1");
 QCheckBox *Preset2 = new QCheckBox("Preset 2");
-QCheckBox *Preset3 = new QCheckBox("Preset 3");
 PresetsLayout->addWidget(Preset1);
 PresetsLayout->addWidget(Preset2);
-PresetsLayout->addWidget(Preset3);
 gridGroupBoxPresets->setLayout(PresetsLayout);
 
 QGroupBox *gridGroupBox;
@@ -159,10 +170,12 @@ gridGroupBox->setLayout(layout);
 
 vLayout->addWidget(label);
 vLayout->addWidget(START_BUTTON);
+vLayout->addWidget(TRAIL_SWITCH);
 vLayout->addWidget(AddElementRandPos);
 vLayout->addWidget(gridGroupBoxAutoMode);
 vLayout->addWidget(gridGroupBox);
 vLayout->addWidget(gridGroupBoxPresets);
+vLayout->addWidget(CLOSE_BUTTON);
 
 
 //Podloze
@@ -188,31 +201,7 @@ Qt3DExtras::QPhongMaterial *planeMaterial = new Qt3DExtras::QPhongMaterial();
     m_planeEntity->addComponent(planeMaterial);
     m_planeEntity->addComponent(planeTransform);
 
-/*
-Qt3DExtras::QPlaneMesh *planeEntity = new Qt3DExtras::QPlaneMesh(sceneRoot);
-planeEntity->setHeight(100.0f);
-planeEntity->setWidth(100.0f);
-planeEntity->setMeshResolution(QSize(20, 20));
 
-Qt3DExtras::QNormalDiffuseSpecularMapMaterial *normalDiffuseSpecularMapMaterial = new Qt3DExtras::QNormalDiffuseSpecularMapMaterial();
-normalDiffuseSpecularMapMaterial->setTextureScale(10.0f);
-normalDiffuseSpecularMapMaterial->setShininess(80.0f);
-normalDiffuseSpecularMapMaterial->setAmbient(QColor(51,20,29));*/
-/*
-Qt3DRender::QTextureImage *diffuseImage = new Qt3DRender::QTextureImage();
-diffuseImage->setSource(QUrl(QStringLiteral("/home/psiejka/Qt/Examples/Qt-5.8/qt3d/exampleresources/assets/textures/pattern_09/diffuse.webp")));
-normalDiffuseSpecularMapMaterial->diffuse()->addTextureImage(diffuseImage);
-
-Qt3DRender::QTextureImage *specularImage = new Qt3DRender::QTextureImage();
-specularImage->setSource(QUrl(QStringLiteral("/home/psiejka/Qt/Examples/Qt-5.8/qt3d/exampleresources/assets/textures/pattern_09/specular.webp")));
-normalDiffuseSpecularMapMaterial->specular()->addTextureImage(specularImage);
-
-Qt3DRender::QTextureImage *normalImage = new Qt3DRender::QTextureImage();
-normalImage->setSource(QUrl((QStringLiteral("/home/psiejka/Qt/Examples/Qt-5.8/qt3d/exampleresources/assets/textures/pattern_09/normal.webp"))));
-normalDiffuseSpecularMapMaterial->normal()->addTextureImage(normalImage);*/
-
-//planeEntity->addComponent(normalDiffuseSpecularMapMaterial);
-//sceneRoot->addComponent(normalDiffuseSpecularMapMaterial);
 
 
 
@@ -221,7 +210,7 @@ lineEditsList.append(lineEdits[0]);
 lineEditsList.append(lineEdits[1]);
 lineEditsList.append(lineEdits[2]);
 
-Scene *window = new Scene(sceneRoot, AddElementBox, START_BUTTON, Preset1);
+Scene *window = new Scene(sceneRoot, AddElementBox, START_BUTTON, TRAIL_SWITCH, Preset1, Preset2);
 
 QObject::connect(AddElementRandPos, SIGNAL(clicked()), window, SLOT(AddFirework()));
 
@@ -233,6 +222,9 @@ QObject::connect(lineEdits[2], SIGNAL(textChanged(const QString &)), window, SLO
 
 QObject::connect(AMlineEdits[0], SIGNAL(textChanged(const QString &)), window, SLOT(MaxParticles(const QString &)));
 
+QObject::connect(CLOSE_BUTTON, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+
 
 QTimer *timer = new QTimer();
 QObject::connect(timer, SIGNAL(timeout()), window, SLOT(update()));
@@ -242,5 +234,4 @@ timer->start(1000 / 33);
 
 widget->show();
 widget->resize(1200, 600);
-
 }

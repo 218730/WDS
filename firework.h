@@ -17,11 +17,13 @@
 #include <QThread>
 
 #include <random>
+#include <math.h>
 
 #include <QtOpenGL/QGLWidget>
 
 #include <QtWidgets/QCheckBox>
 
+#include <QGeometryRenderer>
 
 /**
  * \brief Klasa Firework
@@ -39,7 +41,7 @@ public:
      * \param rootEntity Przestrzeń w której zostaje stworzony obiekt
      * \param Preset1 Włącza predefiniowane zachowania obiektu
      */
-    Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1);
+    Firework(Qt3DCore::QEntity *rootEntity, QCheckBox *Preset1, QCheckBox *Preset2);
     /**
      * \brief Konstruktor fajerwerka z predefiniowaną pozycją przez użytkownika.
      *
@@ -48,7 +50,7 @@ public:
      * \param Preset1 Włącza predefiniowane zachowania obiektu
      * \param boomed_t Okresla czy ma to być fajerwerk przed lub po wybuchu
      */
-    Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, bool boomed_t);
+    Firework(Qt3DCore::QEntity *rootEntity, QVector3D position, QCheckBox *Preset1, QCheckBox *Preset2, bool boomed_t);
     /**
      * \brief Konstruktor "odłamków" po wybuchu fajerwerka.
      *
@@ -56,7 +58,7 @@ public:
      * \param posboomed Pozycja w którym fajerwerk wybuchł
      * \param Preset1 Włącza predefiniowane zachowania obiektu
      */
-    Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1);
+    Firework(Qt3DCore::QEntity *rootEntity, QVector3D posboomed, QCheckBox *Preset1, QCheckBox *Preset2);
     /**
      * \brief Dekonstruktor.
      */
@@ -146,6 +148,11 @@ public:
      *
      */
     void updateBOOM();
+    /**
+     * \brief Określa sposób poruszania się fajerwerków po aktywowaniu predefiniowanych zachowań  nr 2.
+     *
+     */
+    void moveP2();
 
 private:
     Qt3DCore::QEntity *m_sphereEntity;
@@ -176,9 +183,8 @@ private:
 
     std::random_device rd;     // only used once to initialise (seed) engine
 
-    QSurfaceFormat format;
-
     QCheckBox *temp_preset1;
+    QCheckBox *temp_preset2;
 
 };
 

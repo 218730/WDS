@@ -46,16 +46,16 @@ QT_END_NAMESPACE
 /**
  * \brief Klasa Canvas
  *
- * Klasa definiująca scenę dla fajerwerków oraz panel użytkownika.
+ * Klasa definiująca scenę dla fajerwerków oraz panelu użytkownika.
  *
- * \version alfa
+ * \version beta
  */
 class Canvas : public QOpenGLWidget, protected QOpenGLFunctions{
 //class Canvas{
 private:
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
-    QWidget *container = QWidget::createWindowContainer(view);  //DEFAULT
-
+    QWidget *container = QWidget::createWindowContainer(view);  //
+    int value = 50;
     //QWidget *container = QGLWidget::createWindowContainer(view);
     //QOpenGLWidget *container = new QOpenGLWidget();
     QSize screenSize;
@@ -83,7 +83,6 @@ private:
     QPushButton *AddElementBox = new QPushButton();
 
     QStateMachine* machine = new QStateMachine();
-
 
 public:
     /**
